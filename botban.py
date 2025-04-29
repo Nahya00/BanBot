@@ -4,7 +4,7 @@ import asyncio
 import os
 
 # --- CONFIGURATION ---
-TOKEN = os.getenv('TOKEN')  # Récupère ton token sécurisé sur Railway
+TOKEN = os.getenv('TOKEN')
 CHANNEL_ID = 1366186686907944982
 LOG_CHANNEL_ID = 1363252748820287761
 
@@ -62,7 +62,6 @@ class BanRequestView(discord.ui.View):
             try:
                 target_member = await self.message.guild.fetch_member(self.target_id)
 
-                # ENVOYER LE MP AVANT DE BANNIR
                 try:
                     dm_embed = discord.Embed(
                         title="🚨 BANNISSEMENT 🚨",
@@ -78,7 +77,6 @@ class BanRequestView(discord.ui.View):
                 except Exception as e:
                     print(f"Erreur lors de l'envoi du MP : {e}")
 
-                # PUIS BANNIR
                 await target_member.ban(reason=self.reason)
 
                 log_channel = bot.get_channel(LOG_CHANNEL_ID)
@@ -180,7 +178,7 @@ async def demande_ban(ctx, user_id: int, *, reason: str):
         embed.set_image(url=avatar_url)
 
     view = BanRequestView(user_id, reason, ctx.author.id, avatar_url)
-    ban_request_message = await channel.send(embed=embed, view=view)
+    ban_request_message = await channel.send(content=mention_text, embed=embed, view=view)
     view.message = ban_request_message
 
 bot.run(TOKEN)
