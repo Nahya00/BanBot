@@ -1,10 +1,8 @@
-
 import discord
 from discord.ext import commands
 import asyncio
 import os
 
-# --- CONFIGURATION ---
 TOKEN = os.getenv('TOKEN')
 CHANNEL_ID = 1366186686907944982
 LOG_CHANNEL_ID = 1363252748820287761
@@ -141,7 +139,7 @@ async def on_ready():
     print(f"✅ Bot connecté en tant que {bot.user}")
 
 @bot.command(name="demandeban")
-async def demande_ban(ctx, user: discord.User = None, user_id: int = None, *, reason: str = "Aucune raison fournie"):
+async def demande_ban(ctx, member: discord.Member = None, user_id: int = None, *, reason: str = "Aucune raison fournie"):
     if ctx.guild is None:
         return
     if not any(role.id in REQUESTER_ROLES for role in ctx.author.roles):
@@ -150,12 +148,12 @@ async def demande_ban(ctx, user: discord.User = None, user_id: int = None, *, re
     if channel is None:
         return
     try:
-        if user:
-            target = user
+        if member:
+            target = member
         elif user_id:
             target = await bot.fetch_user(user_id)
         else:
-            await ctx.send("❌ Mentionne un utilisateur ou donne un ID.")
+            await ctx.send("❌ Mentionne un membre ou donne son ID.")
             return
         user_display = f"**{target}** (`{target.id}`)"
         avatar_url = target.avatar.url if target.avatar else None
@@ -201,3 +199,4 @@ async def rolesautorises(ctx):
     await ctx.send(embed=embed)
 
 bot.run(TOKEN)
+
