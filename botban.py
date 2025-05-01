@@ -180,5 +180,40 @@ async def demande_ban(ctx, user_id: int, *, reason: str):
     view = BanRequestView(user_id, reason, ctx.author.id, avatar_url)
     ban_request_message = await channel.send(content=mention_text, embed=embed, view=view)
     view.message = ban_request_message
+@bot.command(name="helpban")
+async def helpban(ctx):
+    embed = discord.Embed(
+        title="📚 Aide - Système de Bannissement",
+        description="Voici les commandes disponibles :",
+        color=discord.Color.blurple()
+    )
+    embed.add_field(name="🚨 !demandeban <id> <raison>", value="Créer une demande de ban.", inline=False)
+    embed.add_field(name="📜 !rolesautorises", value="Voir les rôles autorisés à faire ou voter.", inline=False)
+    embed.add_field(name="✅ Système de vote", value="5 votes Confirmer ➔ Ban\n5 votes Refuser ➔ Annulation", inline=False)
+    embed.set_footer(text="Noctys - Système Automatisé")
+    await ctx.send(embed=embed)
 
+@bot.command(name="rolesautorises")
+async def rolesautorises(ctx):
+    guild = ctx.guild
+    if not guild:
+        return
+
+    requester_roles = []
+    for role_id in REQUESTER_ROLES:
+        role = guild.get_role(role_id)
+        requester_roles.append(role.mention if role else f"`ID: {role_id}`")
+
+    validator_roles = []
+    for role_id in VALIDATOR_ROLES:
+        role = guild.get_role(role_id)
+        validator_roles.append(role.mention if role else f"`ID: {role_id}`")
+
+    embed = discord.Embed(
+        title="📜 Rôles Autorisés",
+        color=discord.Color.blue()
+    )
+    embed.add_field(name="Peuvent faire une demande", value="\n".join(requester_roles), inline=False)
+    embed.add_field(name="Peuvent voter", value="\n".join(validator_roles), inline=False)
+    await ctx.send(embed=embed)
 bot.run(TOKEN)
