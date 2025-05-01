@@ -61,29 +61,45 @@ class BanRequestView(discord.ui.View):
             embed.color = discord.Color.green()
             try:
                 target_member = await self.message.guild.fetch_member(self.target_id)
-
                 try:
                     dm_embed = discord.Embed(
                         title="🚨 BANNISSEMENT 🚨",
-                        description=f"Vous avez été banni du serveur **Noctys** pour la raison suivante :\n\n{self.reason}\n\n"
-                                    "Pour faire une demande de débannissement, merci de rejoindre :\n"
-                                    "**https://discord.gg/yGuj5A7Hpa**",
+                        description=f"Vous avez été banni du serveur **Noctys** pour la raison suivante :
+
+{self.reason}
+
+"
+                                    "Pour faire une demande de débannissement, rejoignez :
+**https://discord.gg/yGuj5A7Hpa**",
                         color=discord.Color.red()
                     )
                     dm_embed.set_footer(text="Noctys - Système Automatisé")
                     if target_member.avatar:
                         dm_embed.set_thumbnail(url=target_member.avatar.url)
                     await target_member.send(embed=dm_embed)
-                except Exception as e:
-                    print(f"Erreur lors de l'envoi du MP : {e}")
+                except:
+                    pass
 
                 await target_member.ban(reason=self.reason)
 
                 log_channel = bot.get_channel(LOG_CHANNEL_ID)
                 if log_channel:
+                    confirmateurs = []
+                    for user_id in self.confirm_votes:
+                        try:
+                            user = await bot.fetch_user(user_id)
+                            confirmateurs.append(f"• {user.mention}")
+                        except:
+                            confirmateurs.append(f"• ID {user_id}")
+                    confirmeurs_text = "\n".join(confirmateurs) if confirmateurs else "Aucun"
+
                     log_embed = discord.Embed(
                         title="✅ Bannissement Validé",
-                        description=f"**Membre banni :** {target_member} (`{self.target_id}`)\n**Raison :** {self.reason}",
+                        description=(
+                            f"**Membre banni :** {target_member} (`{self.target_id}`)\n"
+                            f"**Raison :** {self.reason}\n\n"
+                            f"**✅ Confirmé par :**\n{confirmeurs_text}"
+                        ),
                         color=discord.Color.green()
                     )
                     await log_channel.send(embed=log_embed)
@@ -106,12 +122,10 @@ class BanRequestView(discord.ui.View):
         if interaction.user.id in self.refuse_votes:
             self.refuse_votes.remove(interaction.user.id)
         self.confirm_votes.add(interaction.user.id)
-
         await self.update_buttons()
 
         if len(self.confirm_votes) >= VOTE_THRESHOLD:
             await self.finalize_request(accepted=True)
-
         await interaction.response.defer()
 
     @discord.ui.button(label="❌ Refuser (0/5)", style=discord.ButtonStyle.danger)
@@ -123,12 +137,10 @@ class BanRequestView(discord.ui.View):
         if interaction.user.id in self.confirm_votes:
             self.confirm_votes.remove(interaction.user.id)
         self.refuse_votes.add(interaction.user.id)
-
         await self.update_buttons()
 
         if len(self.refuse_votes) >= VOTE_THRESHOLD:
             await self.finalize_request(accepted=False)
-
         await interaction.response.defer()
 
     @discord.ui.button(label="🚫 Annuler", style=discord.ButtonStyle.secondary)
@@ -136,7 +148,6 @@ class BanRequestView(discord.ui.View):
         if not interaction.user.guild_permissions.administrator:
             await interaction.response.send_message("❌ Seuls les administrateurs peuvent annuler une demande.", ephemeral=True)
             return
-
         await self.finalize_request(accepted=False)
         await interaction.response.send_message("🚫 Demande annulée.", ephemeral=True)
 
@@ -145,52 +156,46 @@ async def on_ready():
     print(f"✅ Bot connecté en tant que {bot.user}")
 
 @bot.command(name="demandeban")
-async def demande_ban(ctx, user_id: int, *, reason: str):
+async def demande_ban(ctx, user: discord.User = None, user_id: int = None, *, reason: str = "Aucune raison fournie"):
     if ctx.guild is None:
         return
-
     if not any(role.id in REQUESTER_ROLES for role in ctx.author.roles):
         return
-
     channel = bot.get_channel(CHANNEL_ID)
     if channel is None:
         return
-
     try:
-        user = await bot.fetch_user(user_id)
-        user_display = f"**{user}** (`{user.id}`)"
-        avatar_url = user.avatar.url if user.avatar else None
-    except:
-        user_display = f"`{user_id}`"
-        avatar_url = None
+        if user:
+            target = user
+        elif user_id:
+            target = await bot.fetch_user(user_id)
+        else:
+            await ctx.send("❌ Mentionne un utilisateur ou donne un ID.")
+            return
+        user_display = f"**{target}** (`{target.id}`)"
+        avatar_url = target.avatar.url if target.avatar else None
+    except Exception as e:
+        await ctx.send(f"❌ Utilisateur introuvable : {e}")
+        return
 
-    mention_text = " ".join(f"<@&{role_id}>" for role_id in PRIORITY_MENTION_ROLES)
-
-    embed = discord.Embed(
-        title="🚨 Demande de Bannissement",
-        description=f"{mention_text}",
-        color=discord.Color.orange()
-    )
+    mention_text = " ".join(f"<@&{r}>" for r in PRIORITY_MENTION_ROLES)
+    embed = discord.Embed(title="🚨 Demande de Bannissement", description=mention_text, color=discord.Color.orange())
     embed.add_field(name="👤 Cible", value=user_display, inline=False)
     embed.add_field(name="📎 Raison", value=reason, inline=False)
     embed.set_footer(text=f"Demandé par {ctx.author}", icon_url=ctx.author.avatar.url if ctx.author.avatar else None)
     if avatar_url:
         embed.set_image(url=avatar_url)
 
-    view = BanRequestView(user_id, reason, ctx.author.id, avatar_url)
-    ban_request_message = await channel.send(content=mention_text, embed=embed, view=view)
-    view.message = ban_request_message
+    view = BanRequestView(target.id, reason, ctx.author.id, avatar_url)
+    message = await channel.send(content=mention_text, embed=embed, view=view)
+    view.message = message
+
 @bot.command(name="helpban")
 async def helpban(ctx):
-    embed = discord.Embed(
-        title="📚 Aide - Système de Bannissement",
-        description="Voici les commandes disponibles :",
-        color=discord.Color.blurple()
-    )
-    embed.add_field(name="🚨 !demandeban <id> <raison>", value="Créer une demande de ban.", inline=False)
-    embed.add_field(name="📜 !rolesautorises", value="Voir les rôles autorisés à faire ou voter.", inline=False)
-    embed.add_field(name="✅ Système de vote", value="5 votes Confirmer ➔ Ban\n5 votes Refuser ➔ Annulation", inline=False)
-    embed.set_footer(text="Noctys - Système Automatisé")
+    embed = discord.Embed(title="📚 Aide - Bannissement", color=discord.Color.blurple())
+    embed.add_field(name="!demandeban <@ou ID> <raison>", value="Créer une demande de ban.", inline=False)
+    embed.add_field(name="!rolesautorises", value="Voir les rôles autorisés.", inline=False)
+    embed.add_field(name="✅ Système de vote", value="5 votes ✅ ➔ Ban | 5 votes ❌ ➔ Annulation", inline=False)
     await ctx.send(embed=embed)
 
 @bot.command(name="rolesautorises")
@@ -198,22 +203,11 @@ async def rolesautorises(ctx):
     guild = ctx.guild
     if not guild:
         return
-
-    requester_roles = []
-    for role_id in REQUESTER_ROLES:
-        role = guild.get_role(role_id)
-        requester_roles.append(role.mention if role else f"`ID: {role_id}`")
-
-    validator_roles = []
-    for role_id in VALIDATOR_ROLES:
-        role = guild.get_role(role_id)
-        validator_roles.append(role.mention if role else f"`ID: {role_id}`")
-
-    embed = discord.Embed(
-        title="📜 Rôles Autorisés",
-        color=discord.Color.blue()
-    )
-    embed.add_field(name="Peuvent faire une demande", value="\n".join(requester_roles), inline=False)
-    embed.add_field(name="Peuvent voter", value="\n".join(validator_roles), inline=False)
+    req = [guild.get_role(r).mention if guild.get_role(r) else f"`{r}`" for r in REQUESTER_ROLES]
+    val = [guild.get_role(r).mention if guild.get_role(r) else f"`{r}`" for r in VALIDATOR_ROLES]
+    embed = discord.Embed(title="📜 Rôles Autorisés", color=discord.Color.blue())
+    embed.add_field(name="Peuvent créer une demande", value="\n".join(req), inline=False)
+    embed.add_field(name="Peuvent voter", value="\n".join(val), inline=False)
     await ctx.send(embed=embed)
+
 bot.run(TOKEN)
