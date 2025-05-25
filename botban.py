@@ -9,18 +9,15 @@ CHANNEL_ID = 1366186686907944982
 LOG_CHANNEL_ID = 1363252748820287761
 
 REQUESTER_ROLES = [
-    1362033700946186301, 1364194597734973492, 1365837084233039932,
-    1362033708487409748, 1362033723121602612, 1362033735910031493,
-    1362033746601316622, 1365894628569518110, 1362033753538564288,
-    1362033883482296380, 1362033760534663419, 1362033775084699711
-    1362033771595038793, 1365525197473579008,
-    
+    1365837084233039932, 1362033700946186301, 1364194597734973492,
+    1362033723121602612, 1362033735910031493, 1365894628569518110,
+    1362033746601316622, 1362033753538564288, 1374914013762424842,
+    1362033760534663419, 1362033782357496020, 1362033883482296380
 ]
 
 VALIDATOR_ROLES = [
-    1362033700946186301, 1364194597734973492, 1365837084233039932,
-    1362033708487409748, 1362033723121602612, 1362033735910031493,
-    
+    1365837084233039932, 1362033700946186301,
+    1364194597734973492, 1362033723121602612
 ]
 
 PRIORITY_MENTION_ROLES = [
@@ -58,10 +55,8 @@ class BanRequestView(discord.ui.View):
                 try:
                     dm_embed = discord.Embed(
                         title="🚨 BANNISSEMENT 🚨",
-                        description=(
-                            f"Vous avez été banni du serveur **Noctys** pour la raison suivante :\n\n{self.reason}\n\n"
-                            "Pour faire une demande de débannissement, rejoignez :\n**https://discord.gg/yGuj5A7Hpa**"
-                        ),
+                        description=(f"Vous avez été banni du serveur **Noctys** pour la raison suivante :\n\n{self.reason}\n\n"
+                                     "Pour faire une demande de débannissement, rejoignez :\n**https://discord.gg/yGuj5A7Hpa**"),
                         color=discord.Color.red()
                     )
                     dm_embed.set_footer(text="Noctys - Système Automatisé")
@@ -137,7 +132,6 @@ async def on_ready():
 async def demandeban(ctx, identifiant: str, *, reason: str):
     if not any(role.id in REQUESTER_ROLES for role in ctx.author.roles):
         return
-
     try:
         if identifiant.isdigit():
             target = await bot.fetch_user(int(identifiant))
@@ -149,7 +143,7 @@ async def demandeban(ctx, identifiant: str, *, reason: str):
 
     user_display = f"**{target}** (`{target.id}`)"
     avatar_url = target.avatar.url if target.avatar else None
-    mention_text = " ".join(f"<@&{role_id}>" for role_id in PRIORITY_MENTION_ROLES)
+    mention_text = " ".join(f"<@&{r}>" for r in PRIORITY_MENTION_ROLES)
 
     embed = discord.Embed(
         title="🚨 Demande de Bannissement",
