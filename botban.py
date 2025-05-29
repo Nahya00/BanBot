@@ -49,9 +49,7 @@ class BanView(discord.ui.View):
             embed.color = discord.Color.green()
             try:
                 await self.target.send(
-                    f"🚨 Tu as été banni du serveur Noctys pour : {self.reason}
-"
-                    "Tu peux faire une demande de déban ici : https://discord.gg/yGuj5A7Hpa"
+                    f"👑 Tu as été banni du serveur Noctys pour : {self.reason}\\n""Tu peux faire une demande de déban ici : https://discord.gg/yGuj5A7Hpa"
                 )
             except:
                 pass
