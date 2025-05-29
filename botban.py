@@ -57,8 +57,7 @@ class BanView(discord.ui.View):
             await self.message.guild.ban(self.target, reason=self.reason)
             log = discord.Embed(
                 title="🚨 Bannissement exécuté",
-                description=f"👤 {self.target} (`{self.target.id}`)
-📎 Raison : {self.reason}",
+                description=f"👤 {self.target} (`{self.target.id}`)\n📎 Raison : {self.reason}",
                 color=discord.Color.red()
             )
             log.add_field(name="✅ Votants", value="\n".join(f"<@{uid}>" for uid in self.yes_votes), inline=False)
