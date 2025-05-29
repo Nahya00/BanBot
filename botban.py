@@ -3,8 +3,8 @@ from discord import app_commands
 from discord.ext import commands
 import os
 
-TOKEN = os.getenv('TOKEN')
-GUILD_ID = 1360356060229013605  # Remplace par ton ID de serveur
+TOKEN = os.getenv("TOKEN")
+GUILD_ID = 1360356060229013605  # Remplacer avec l’ID réel
 CHANNEL_ID = 1366186686907944982
 LOG_CHANNEL_ID = 1363252748820287761
 
@@ -49,7 +49,8 @@ class BanView(discord.ui.View):
             embed.color = discord.Color.green()
             try:
                 await self.target.send(
-                    f"🚨 Tu as été banni du serveur Noctys pour : {self.reason}\n"
+                    f"🚨 Tu as été banni du serveur Noctys pour : {self.reason}
+"
                     "Tu peux faire une demande de déban ici : https://discord.gg/yGuj5A7Hpa"
                 )
             except:
@@ -57,15 +58,16 @@ class BanView(discord.ui.View):
             await self.message.guild.ban(self.target, reason=self.reason)
             log = discord.Embed(
                 title="🚨 Bannissement exécuté",
-                description=f"👤 {self.target} (`{self.target.id}`)\n📎 Raison : {self.reason}",
+                description=f"👤 {self.target} (`{self.target.id}`)
+📎 Raison : {self.reason}",
                 color=discord.Color.red()
             )
-            log.add_field(name="✅ Votants", value="\n".join(f"<@{uid}>" for uid in self.yes_votes), inline=False)
+            log.add_field(name="✅ Votants", value="
+".join(f"<@{uid}>" for uid in self.yes_votes), inline=False)
             await bot.get_channel(LOG_CHANNEL_ID).send(embed=log)
         else:
             embed.title = "❌ Demande refusée"
             embed.color = discord.Color.red()
-
         await self.message.edit(embed=embed, view=None)
         self.stop()
 
@@ -108,7 +110,6 @@ async def demandeban(interaction: discord.Interaction, membre: discord.Member, r
     if not any(role.id in REQUESTER_ROLES for role in interaction.user.roles):
         await interaction.response.send_message("⛔ Tu n'as pas la permission.", ephemeral=True)
         return
-
     mention_text = " ".join(f"<@&{rid}>" for rid in PRIORITY_ROLES)
     embed = discord.Embed(
         title="🚨 Nouvelle demande de bannissement",
@@ -120,14 +121,13 @@ async def demandeban(interaction: discord.Interaction, membre: discord.Member, r
     embed.set_footer(text=f"Demandée par {interaction.user}", icon_url=interaction.user.avatar.url if interaction.user.avatar else None)
     if preuve:
         embed.set_image(url=preuve)
-
     view = BanView(membre, raison, preuve, interaction.user.id)
     sent = await bot.get_channel(CHANNEL_ID).send(content=mention_text, embed=embed, view=view)
     view.message = sent
     await interaction.response.send_message("✅ Demande envoyée avec succès.", ephemeral=True)
-    
-    @bot.tree.command(name="helpban", description="Affiche l'aide des commandes disponibles", guild=discord.Object(id=GUILD_ID))
-    async def helpban(interaction: discord.Interaction):
+
+@bot.tree.command(name="helpban", description="Affiche l'aide des commandes disponibles", guild=discord.Object(id=GUILD_ID))
+async def helpban(interaction: discord.Interaction):
     embed = discord.Embed(
         title="📚 Aide - Système de bannissement",
         description="Voici les commandes et leur fonctionnement :",
@@ -138,14 +138,12 @@ async def demandeban(interaction: discord.Interaction, membre: discord.Member, r
     embed.add_field(name="📬 MP automatique", value="Un message privé est envoyé à la personne bannie avec la raison et un lien de recours.", inline=False)
     embed.set_footer(text="Noctys - Tribunal Automatisé")
     await interaction.response.send_message(embed=embed, ephemeral=True)
-    
-    
-    @bot.tree.command(name="rolesautorises", description="Liste des rôles autorisés à voter ou créer une demande", guild=discord.Object(id=GUILD_ID))
-    async def rolesautorises(interaction: discord.Interaction):
+
+@bot.tree.command(name="rolesautorises", description="Liste des rôles autorisés à voter ou créer une demande", guild=discord.Object(id=GUILD_ID))
+async def rolesautorises(interaction: discord.Interaction):
     guild = interaction.guild
     req_roles = [guild.get_role(r) for r in REQUESTER_ROLES]
     val_roles = [guild.get_role(r) for r in VALIDATOR_ROLES]
-
     embed = discord.Embed(title="📋 Rôles autorisés", color=discord.Color.blue())
     embed.add_field(
         name="Peuvent faire une demande",
@@ -159,7 +157,5 @@ async def demandeban(interaction: discord.Interaction, membre: discord.Member, r
     )
     embed.set_footer(text="Mis à jour automatiquement")
     await interaction.response.send_message(embed=embed, ephemeral=True)
-
-
 
 bot.run(TOKEN)
