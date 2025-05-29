@@ -120,6 +120,8 @@ async def demandeban(interaction: discord.Interaction, membre: discord.Member, r
     if preuve:
         embed.add_field(name="🧾 Preuve", value=preuve, inline=False)
     embed.set_footer(text=f"Demandée par {interaction.user}", icon_url=interaction.user.avatar.url if interaction.user.avatar else None)
+    if membre.avatar:
+    embed.set_thumbnail(url=membre.avatar.url)
 
     if image and image.content_type.startswith("image/"):
         embed.set_image(url=image.url)
