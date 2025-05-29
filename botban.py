@@ -125,5 +125,41 @@ async def demandeban(interaction: discord.Interaction, membre: discord.Member, r
     sent = await bot.get_channel(CHANNEL_ID).send(content=mention_text, embed=embed, view=view)
     view.message = sent
     await interaction.response.send_message("✅ Demande envoyée avec succès.", ephemeral=True)
+    
+    @bot.tree.command(name="helpban", description="Affiche l'aide des commandes disponibles", guild=discord.Object(id=GUILD_ID))
+    async def helpban(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="📚 Aide - Système de bannissement",
+        description="Voici les commandes et leur fonctionnement :",
+        color=discord.Color.blurple()
+    )
+    embed.add_field(name="/demandeban", value="Créer une demande de bannissement avec preuve et raison.", inline=False)
+    embed.add_field(name="✅ Votes requis", value="5 votes positifs ou négatifs valident ou annulent automatiquement.", inline=False)
+    embed.add_field(name="📬 MP automatique", value="Un message privé est envoyé à la personne bannie avec la raison et un lien de recours.", inline=False)
+    embed.set_footer(text="Noctys - Tribunal Automatisé")
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+    
+    
+    @bot.tree.command(name="rolesautorises", description="Liste des rôles autorisés à voter ou créer une demande", guild=discord.Object(id=GUILD_ID))
+    async def rolesautorises(interaction: discord.Interaction):
+    guild = interaction.guild
+    req_roles = [guild.get_role(r) for r in REQUESTER_ROLES]
+    val_roles = [guild.get_role(r) for r in VALIDATOR_ROLES]
+
+    embed = discord.Embed(title="📋 Rôles autorisés", color=discord.Color.blue())
+    embed.add_field(
+        name="Peuvent faire une demande",
+        value="\n".join(role.mention for role in req_roles if role is not None) or "Aucun",
+        inline=False
+    )
+    embed.add_field(
+        name="Peuvent voter",
+        value="\n".join(role.mention for role in val_roles if role is not None) or "Aucun",
+        inline=False
+    )
+    embed.set_footer(text="Mis à jour automatiquement")
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
 
 bot.run(TOKEN)
