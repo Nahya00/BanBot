@@ -1,10 +1,11 @@
+
 import discord
 from discord import app_commands
 from discord.ext import commands
 import os
 
 TOKEN = os.getenv("TOKEN")
-GUILD_ID = 1360356060229013605  # Remplacer avec l’ID réel
+GUILD_ID = 1360356060229013605
 CHANNEL_ID = 1366186686907944982
 LOG_CHANNEL_ID = 1363252748820287761
 
@@ -49,7 +50,9 @@ class BanView(discord.ui.View):
             embed.color = discord.Color.green()
             try:
                 await self.target.send(
-                    f"👑 Tu as été banni du serveur Noctys pour : {self.reason}\\n""Tu peux faire une demande de déban ici : https://discord.gg/yGuj5A7Hpa"
+                    f"👑 Tu as été banni du serveur Noctys pour : {self.reason}
+"
+                    "Tu peux faire une demande de déban ici : https://discord.gg/yGuj5A7Hpa"
                 )
             except:
                 pass
@@ -60,8 +63,7 @@ class BanView(discord.ui.View):
 📎 Raison : {self.reason}",
                 color=discord.Color.red()
             )
-            log.add_field(name="✅ Votants", value="
-".join(f"<@{uid}>" for uid in self.yes_votes), inline=False)
+            log.add_field(name="✅ Votants", value="\n".join(f"<@{uid}>" for uid in self.yes_votes), inline=False)
             await bot.get_channel(LOG_CHANNEL_ID).send(embed=log)
         else:
             embed.title = "❌ Demande refusée"
@@ -124,6 +126,20 @@ async def demandeban(interaction: discord.Interaction, membre: discord.Member, r
     view.message = sent
     await interaction.response.send_message("✅ Demande envoyée avec succès.", ephemeral=True)
 
+
+@bot.tree.command(name="helpban", description="Affiche l'aide des commandes disponibles", guild=discord.Object(id=GUILD_ID))
+async def helpban(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="📚 Aide - Système de bannissement",
+        description="Voici les commandes et leur fonctionnement :",
+        color=discord.Color.blurple()
+    )
+    embed.add_field(name="/demandeban", value="Créer une demande de bannissement avec preuve et raison.", inline=False)
+    embed.add_field(name="✅ Votes requis", value="5 votes positifs ou négatifs valident ou annulent automatiquement.", inline=False)
+    embed.add_field(name="📬 MP automatique", value="Un message privé est envoyé à la personne bannie avec la raison et un lien de recours.", inline=False)
+    embed.set_footer(text="Noctys - Tribunal Automatisé")
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+    
 @bot.tree.command(name="helpban", description="Affiche l'aide des commandes disponibles", guild=discord.Object(id=GUILD_ID))
 async def helpban(interaction: discord.Interaction):
     embed = discord.Embed(
