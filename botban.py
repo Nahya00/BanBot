@@ -136,19 +136,6 @@ async def helpban(interaction: discord.Interaction):
     embed.add_field(name="📬 MP automatique", value="Un message privé est envoyé à la personne bannie avec la raison et un lien de recours.", inline=False)
     embed.set_footer(text="Noctys - Tribunal Automatisé")
     await interaction.response.send_message(embed=embed, ephemeral=True)
-    
-@bot.tree.command(name="helpban", description="Affiche l'aide des commandes disponibles", guild=discord.Object(id=GUILD_ID))
-async def helpban(interaction: discord.Interaction):
-    embed = discord.Embed(
-        title="📚 Aide - Système de bannissement",
-        description="Voici les commandes et leur fonctionnement :",
-        color=discord.Color.blurple()
-    )
-    embed.add_field(name="/demandeban", value="Créer une demande de bannissement avec preuve et raison.", inline=False)
-    embed.add_field(name="✅ Votes requis", value="5 votes positifs ou négatifs valident ou annulent automatiquement.", inline=False)
-    embed.add_field(name="📬 MP automatique", value="Un message privé est envoyé à la personne bannie avec la raison et un lien de recours.", inline=False)
-    embed.set_footer(text="Noctys - Tribunal Automatisé")
-    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.tree.command(name="rolesautorises", description="Liste des rôles autorisés à voter ou créer une demande", guild=discord.Object(id=GUILD_ID))
 async def rolesautorises(interaction: discord.Interaction):
