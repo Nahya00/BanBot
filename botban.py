@@ -101,12 +101,14 @@ async def on_ready():
 @app_commands.describe(
     membre="Membre à bannir",
     raison="Raison du bannissement",
-    preuve="Lien de l'image (facultatif)"
+    preuve="Lien ou explication",
+    image="Image en pièce jointe (facultatif)"
 )
-async def demandeban(interaction: discord.Interaction, membre: discord.Member, raison: str, preuve: str = None):
+async def demandeban(interaction: discord.Interaction, membre: discord.Member, raison: str, preuve: str = None, image: discord.Attachment = None):
     if not any(role.id in REQUESTER_ROLES for role in interaction.user.roles):
         await interaction.response.send_message("⛔ Tu n'as pas la permission.", ephemeral=True)
         return
+
     mention_text = " ".join(f"<@&{rid}>" for rid in PRIORITY_ROLES)
     embed = discord.Embed(
         title="🚨 Nouvelle demande de bannissement",
@@ -115,10 +117,14 @@ async def demandeban(interaction: discord.Interaction, membre: discord.Member, r
     )
     embed.add_field(name="👤 Membre", value=f"{membre} (`{membre.id}`)", inline=False)
     embed.add_field(name="📎 Raison", value=raison, inline=False)
-    embed.set_footer(text=f"Demandée par {interaction.user}", icon_url=interaction.user.avatar.url if interaction.user.avatar else None)
     if preuve:
-        embed.set_image(url=preuve)
-    view = BanView(membre, raison, preuve, interaction.user.id)
+        embed.add_field(name="🧾 Preuve", value=preuve, inline=False)
+    embed.set_footer(text=f"Demandée par {interaction.user}", icon_url=interaction.user.avatar.url if interaction.user.avatar else None)
+
+    if image and image.content_type.startswith("image/"):
+        embed.set_image(url=image.url)
+
+    view = BanView(membre, raison, image.url if image else None, interaction.user.id)
     sent = await bot.get_channel(CHANNEL_ID).send(content=mention_text, embed=embed, view=view)
     view.message = sent
     await interaction.response.send_message("✅ Demande envoyée avec succès.", ephemeral=True)
