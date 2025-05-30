@@ -114,8 +114,11 @@ async def demandeban(interaction: discord.Interaction, membre: discord.Member, r
         title="🚨 Nouvelle demande de bannissement",
         description=mention_text,
         color=discord.Color.orange()
-    )
-    embed.add_field(name="👤 Membre", value=f"{membre} (`{membre.id}`)", inline=False)
+        
+   embed.set_author(
+    name=f"{membre} ({membre.id})",
+    icon_url=membre.display_avatar.url
+)
     embed.add_field(name="📎 Raison", value=raison, inline=False)
     if preuve:
         embed.add_field(name="🧾 Preuve", value=preuve, inline=False)
