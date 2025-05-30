@@ -117,8 +117,8 @@ async def demandeban(interaction: discord.Interaction, membre: discord.Member, r
 )
     
    embed.set_author(
-    name=f"{membre} ({membre.id})",
-    icon_url=membre.display_avatar.url
+       name=f"{membre} ({membre.id})",
+       icon_url=membre.display_avatar.url
 )
     embed.add_field(name="📎 Raison", value=raison, inline=False)
     if preuve:
