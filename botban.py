@@ -5,23 +5,23 @@ from discord.ext import commands
 import os
 
 TOKEN = os.getenv("TOKEN")
-GUILD_ID = 1360356060229013605
-CHANNEL_ID = 1366186686907944982
-LOG_CHANNEL_ID = 1363252748820287761
+GUILD_ID = 1361778893681463436
+CHANNEL_ID = 1379270661360451737
+LOG_CHANNEL_ID = 1379271417392009216
 
 REQUESTER_ROLES = [
-    1365837084233039932, 1362033700946186301, 1362033883482296380,
-    1362033723121602612, 1362033735910031493, 1365894628569518110,
-    1362033746601316622, 1362033753538564288, 1374914013762424842,
-    1362033760534663419, 1362033782357496020, 
+    1379268686141063289, 1379268700145717374, 1379268712250474516,
+    1379268737206714408, 1379268752335569036, 1379268744991215769,
+    1379268795536769137, 1379268792122605619, 1379268763605532763,
+    1379268759239528499, 1379268748824940575, 1379268777765638243,
+    1379268770727596093
 ]
 
 VALIDATOR_ROLES = [
-    1365837084233039932, 1362033700946186301,
-    1362033723121602612
+    1379268686141063289, 1379268700145717374,
 ]
 
-PRIORITY_ROLES = [1365837084233039932, 1362033723121602612]
+PRIORITY_ROLES = [1379268686141063289, 1379268700145717374]
 VOTE_THRESHOLD = 5
 
 intents = discord.Intents.all()
@@ -50,7 +50,7 @@ class BanView(discord.ui.View):
             embed.color = discord.Color.green()
             try:
                 await self.target.send(
-                    f"👑 Tu as été banni du serveur Noctys pour : {self.reason}\nTu peux faire une demande de déban ici : https://discord.gg/yGuj5A7Hpa"
+                    f"👑 Tu as été banni du serveur Tsukaya pour : {self.reason}\nTu peux faire une demande de déban ici : https://discord.gg/yGuj5A7Hpa"
                 )
             except:
                 pass
@@ -147,7 +147,7 @@ async def helpban(interaction: discord.Interaction):
     embed.add_field(name="/demandeban", value="Créer une demande de bannissement avec preuve et raison.", inline=False)
     embed.add_field(name="✅ Votes requis", value="5 votes positifs ou négatifs valident ou annulent automatiquement.", inline=False)
     embed.add_field(name="📬 MP automatique", value="Un message privé est envoyé à la personne bannie avec la raison et un lien de recours.", inline=False)
-    embed.set_footer(text="Noctys - Tribunal Automatisé")
+    embed.set_footer(text="Tsukaya - Tribunal Automatisé")
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.tree.command(name="rolesautorises", description="Liste des rôles autorisés à voter ou créer une demande", guild=discord.Object(id=GUILD_ID))
