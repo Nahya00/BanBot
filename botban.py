@@ -114,28 +114,29 @@ async def demandeban(interaction: discord.Interaction, membre: discord.Member, r
         title="🚨 Nouvelle demande de bannissement",
         description=mention_text,
         color=discord.Color.orange()
-)        
-    
+    )
     embed.set_author(
-       name=f"{membre} ({membre.id})",
-       icon_url=membre.display_avatar.url
-)
+        name=f"{membre} ({membre.id})",
+        icon_url=membre.display_avatar.url if membre.display_avatar else None
+    )
     embed.add_field(name="📎 Raison", value=raison, inline=False)
     if preuve:
         embed.add_field(name="🧾 Preuve", value=preuve, inline=False)
-    embed.set_footer(text=f"Demandée par {interaction.user}", icon_url=interaction.user.avatar.url if interaction.user.avatar else None)
-    embed.set_thumbnail(url=membre.display_avatar.url)
-
-
-
-    if image and image.content_type.startswith("image/"):
+    embed.set_footer(
+        text=f"Demandée par {interaction.user}",
+        icon_url=interaction.user.avatar.url if interaction.user.avatar else None
+    )
+    embed.set_thumbnail(url=membre.display_avatar.url if membre.display_avatar else None)
+    if image and hasattr(image, "content_type") and image.content_type and image.content_type.startswith("image/"):
         embed.set_image(url=image.url)
 
     view = BanView(membre, raison, image.url if image else None, interaction.user.id)
-    sent = await bot.get_channel(CHANNEL_ID).send(content=mention_text, embed=embed, view=view)
-    view.message = sent
-    await interaction.response.send_message("✅ Demande envoyée avec succès.", ephemeral=True)
-
+    try:
+        sent = await bot.get_channel(CHANNEL_ID).send(content=mention_text, embed=embed, view=view)
+        view.message = sent
+        await interaction.response.send_message("✅ Demande envoyée avec succès.", ephemeral=True)
+    except Exception as e:
+        await interaction.response.send_message(f"❌ Erreur lors de l'envoi : {e}", ephemeral=True)
 
 @bot.tree.command(name="helpban", description="Affiche l'aide des commandes disponibles", guild=discord.Object(id=GUILD_ID))
 async def helpban(interaction: discord.Interaction):
