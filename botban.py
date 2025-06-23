@@ -50,15 +50,14 @@ class BanView(discord.ui.View):
             embed.color = discord.Color.green()
             try:
                 await self.target.send(
-                    f"👑 Tu as été banni du serveur Tsukaya pour : {self.reason}/nTu peux faire une demande de déban ici : https://discord.gg/6PazrVtCMs"
+                    f"👑 Tu as été banni du serveur Tsukaya pour : {self.reason}\nTu peux faire une demande de déban ici : https://discord.gg/6PazrVtCMs"
                 )
             except:
                 pass
             await self.message.guild.ban(self.target, reason=self.reason)
             log = discord.Embed(
                 title="🚨 Bannissement exécuté",
-                description=f"👤 {self.target} (`{self.target.id}`)"
-📎 Raison : {self.reason}",
+                description=f"👤 {self.target} (`{self.target.id}`)\n📎 Raison : {self.reason}",
                 color=discord.Color.red()
             )
             log.add_field(name="✅ Votants", value="\n".join(f"<@{uid}>" for uid in self.yes_votes), inline=False)
