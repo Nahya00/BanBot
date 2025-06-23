@@ -57,7 +57,7 @@ class BanView(discord.ui.View):
             await self.message.guild.ban(self.target, reason=self.reason)
             log = discord.Embed(
                 title="🚨 Bannissement exécuté",
-                description=f"👤 {self.target} (`{self.target.id}`)
+                description=f"👤 {self.target} (`{self.target.id}`)"
 📎 Raison : {self.reason}",
                 color=discord.Color.red()
             )
