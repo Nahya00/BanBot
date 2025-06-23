@@ -18,7 +18,7 @@ REQUESTER_ROLES = [
 ]
 
 VALIDATOR_ROLES = [
-    1379268686141063289, 1379268700145717374,
+    1379268686141063289, 1379268700145717374
 ]
 
 PRIORITY_ROLES = [1379268686141063289, 1379268700145717374]
@@ -50,20 +50,22 @@ class BanView(discord.ui.View):
             embed.color = discord.Color.green()
             try:
                 await self.target.send(
-                    f"👑 Tu as été banni du serveur Tsukaya pour : {self.reason}\nTu peux faire une demande de déban ici : https://discord.gg/yGuj5A7Hpa"
+                    f"👑 Tu as été banni du serveur Noctys pour : {self.reason}
+Tu peux faire une demande de déban ici : https://discord.gg/yGuj5A7Hpa"
                 )
             except:
                 pass
             await self.message.guild.ban(self.target, reason=self.reason)
             log = discord.Embed(
                 title="🚨 Bannissement exécuté",
-                description=f"👤 {self.target} (`{self.target.id}`)\n📎 Raison : {self.reason}",
+                description=f"👤 {self.target} (`{self.target.id}`)
+📎 Raison : {self.reason}",
                 color=discord.Color.red()
             )
             log.add_field(name="✅ Votants", value="\n".join(f"<@{uid}>" for uid in self.yes_votes), inline=False)
             await bot.get_channel(LOG_CHANNEL_ID).send(embed=log)
         else:
-            embed.title = "❌ Demande refusée"
+            embed.title = "❌ Demande annulée"
             embed.color = discord.Color.red()
         await self.message.edit(embed=embed, view=None)
         self.stop()
@@ -91,6 +93,14 @@ class BanView(discord.ui.View):
         if len(self.no_votes) >= VOTE_THRESHOLD:
             await self.finalize(False, interaction)
         await interaction.response.defer()
+
+    @discord.ui.button(label="🛑 Annuler", style=discord.ButtonStyle.secondary, row=1)
+    async def cancel_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.requester_id and not interaction.user.guild_permissions.administrator:
+            await interaction.response.send_message("⛔ Tu ne peux pas annuler cette demande.", ephemeral=True)
+            return
+        await self.finalize(False, interaction)
+        await interaction.response.send_message("🚫 Demande annulée.", ephemeral=True)
 
 @bot.event
 async def on_ready():
@@ -131,12 +141,9 @@ async def demandeban(interaction: discord.Interaction, membre: discord.Member, r
         embed.set_image(url=image.url)
 
     view = BanView(membre, raison, image.url if image else None, interaction.user.id)
-    try:
-        sent = await bot.get_channel(CHANNEL_ID).send(content=mention_text, embed=embed, view=view)
-        view.message = sent
-        await interaction.response.send_message("✅ Demande envoyée avec succès.", ephemeral=True)
-    except Exception as e:
-        await interaction.response.send_message(f"❌ Erreur lors de l'envoi : {e}", ephemeral=True)
+    sent = await bot.get_channel(CHANNEL_ID).send(content=mention_text, embed=embed, view=view)
+    view.message = sent
+    await interaction.response.send_message("✅ Demande envoyée avec succès.", ephemeral=True)
 
 @bot.tree.command(name="helpban", description="Affiche l'aide des commandes disponibles", guild=discord.Object(id=GUILD_ID))
 async def helpban(interaction: discord.Interaction):
@@ -145,10 +152,10 @@ async def helpban(interaction: discord.Interaction):
         description="Voici les commandes et leur fonctionnement :",
         color=discord.Color.blurple()
     )
-    embed.add_field(name="/demandeban", value="Créer une demande de bannissement avec preuve et raison.", inline=False)
+    embed.add_field(name="/demandeban", value="Créer une demande de bannissement avec preuve et image.", inline=False)
     embed.add_field(name="✅ Votes requis", value="5 votes positifs ou négatifs valident ou annulent automatiquement.", inline=False)
     embed.add_field(name="📬 MP automatique", value="Un message privé est envoyé à la personne bannie avec la raison et un lien de recours.", inline=False)
-    embed.set_footer(text="Tsukaya - Tribunal Automatisé")
+    embed.set_footer(text="Noctys - Tribunal Automatisé")
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.tree.command(name="rolesautorises", description="Liste des rôles autorisés à voter ou créer une demande", guild=discord.Object(id=GUILD_ID))
@@ -171,3 +178,4 @@ async def rolesautorises(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 bot.run(TOKEN)
+
