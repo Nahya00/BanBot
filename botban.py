@@ -14,14 +14,14 @@ REQUESTER_ROLES = [
     1379268737206714408, 1379268752335569036, 1379268744991215769,
     1379268795536769137, 1379268792122605619, 1379268763605532763,
     1379268759239528499, 1379268748824940575, 1379268777765638243,
-    1379268770727596093
+    1379268770727596093, 1391744270150537306
 ]
 
 VALIDATOR_ROLES = [
-    1379268686141063289, 1379268700145717374
+    1379268686141063289, 1379268700145717374, 1391744270150537306
 ]
 
-PRIORITY_ROLES = [1379268686141063289, 1379268700145717374]
+PRIORITY_ROLES = [1379268686141063289, 1379268700145717374, 1391744270150537306]
 VOTE_THRESHOLD = 5
 
 intents = discord.Intents.all()
@@ -153,7 +153,7 @@ async def helpban(interaction: discord.Interaction):
     embed.add_field(name="/demandeban", value="Créer une demande de bannissement avec preuve et image.", inline=False)
     embed.add_field(name="✅ Votes requis", value="5 votes positifs ou négatifs valident ou annulent automatiquement.", inline=False)
     embed.add_field(name="📬 MP automatique", value="Un message privé est envoyé à la personne bannie avec la raison et un lien de recours.", inline=False)
-    embed.set_footer(text="Noctys - Tribunal Automatisé")
+    embed.set_footer(text="Tsukaya - Tribunal Automatisé")
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.tree.command(name="rolesautorises", description="Liste des rôles autorisés à voter ou créer une demande", guild=discord.Object(id=GUILD_ID))
