@@ -14,11 +14,11 @@ REQUESTER_ROLES = [
     1379268737206714408, 1379268752335569036, 1379268744991215769,
     1379268795536769137, 1379268792122605619, 1379268763605532763,
     1379268759239528499, 1379268748824940575, 1379268777765638243,
-    1379268770727596093, 1391744270150537306
+    1379268770727596093, 1391744270150537306, 1379268682257141890
 ]
 
 VALIDATOR_ROLES = [
-    1379268686141063289, 1379268700145717374, 1391744270150537306
+    1379268686141063289, 1379268700145717374, 1391744270150537306, 1379268682257141890
 ]
 
 PRIORITY_ROLES = [1379268686141063289, 1379268700145717374, 1391744270150537306]
@@ -50,7 +50,7 @@ class BanView(discord.ui.View):
             embed.color = discord.Color.green()
             try:
                 await self.target.send(
-                    f"👑 Tu as été banni du serveur Tsukaya pour : {self.reason}\nTu peux faire une demande de déban ici : https://discord.gg/6PazrVtCMs"
+                    f"👑 Tu as été banni du serveur Tsukaya pour : {self.reason}\nTu peux faire une demande de déban ici : https://discord.gg/5xzjnhcNsw"
                 )
             except:
                 pass
